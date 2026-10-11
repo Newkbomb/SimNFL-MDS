@@ -166,12 +166,16 @@ function aiPick(P,taken,team,round,tp,rnd,rc){
     const s=aiScore(p,team,round,tp,rnd,rc);if(s>bs){bs=s;best=p}}
   return best;
 }
-function classScore(picks,team,P){
-  let s=0;const seen=new Set();
-  picks.forEach(k=>{s+=k.p.v-P[k.overall-1].v;const n=team.needs.find(n=>hasPos(k.p,n)&&!seen.has(n));if(n){seen.add(n);s+=.6}});
-  return s/Math.sqrt(picks.length||1);
+const GP={a:20,b:.35,neg:16,need:12};
+const tol=o=>GP.a+GP.b*o;
+function pickPts(d,o){const T=tol(o);return d>=0?78+22*Math.min(1,d/(1.5*T)):Math.max(0,78-GP.neg*Math.max(0,-d-.4*T)/T)}
+function classScore(picks,team){
+  if(!picks.length)return 0;
+  const filled=new Set();let s=0;
+  picks.forEach(k=>{let x=pickPts(k.overall-k.p.rank,k.overall);const n=team.needs.find(n=>hasPos(k.p,n)&&!filled.has(n));if(n){filled.add(n);x=Math.min(100,x+GP.need)}s+=x});
+  return s/picks.length;
 }
-if(typeof module!=='undefined')module.exports={prep,buildSlots,aiPick,classScore,gi,NEED,hasPos,W,NOISE};
+if(typeof module!=='undefined')module.exports={prep,buildSlots,aiPick,classScore,gi,NEED,hasPos,W,NOISE,tol,GP};
 
 const $=s=>document.querySelector(s);
 const TC={ARI:['#97233F','#000000'],ATL:['#A71930','#000000'],BAL:['#241773','#9E7C0C'],BUF:['#00338D','#C60C30'],CAR:['#0078B6','#101820'],CHI:['#0B162A','#C83803'],CIN:['#FB4F14','#000000'],CLE:['#311D00','#FF3C00'],DAL:['#003594','#869397'],DEN:['#FB4F14','#002244'],DET:['#0076B6','#B0B7BC'],GB:['#203731','#FFB612'],HOU:['#03202F','#A71930'],IND:['#002C5F','#A2AAAD'],JAX:['#006778','#D7A22A'],KC:['#E31837','#FFB81C'],LAC:['#0078BA','#FFC20E'],LAR:['#003594','#FFA300'],LV:['#000000','#A5ACAF'],MIA:['#008E97','#FC4C02'],MIN:['#4F2683','#FFC62F'],NE:['#002244','#C60C30'],NO:['#D3BC8D','#101820'],NYG:['#0B2265','#A71930'],NYJ:['#125740','#000000'],PHI:['#004C54','#A5ACAF'],PIT:['#101820','#FFB612'],SEA:['#002244','#69BE28'],SF:['#AA0000','#B3995D'],TB:['#D50A0A','#34302B'],TEN:['#0C2340','#4B92DB'],WAS:['#5A1414','#FFB612']};
@@ -185,10 +189,10 @@ D.teams.forEach(t=>{T[t.abbr]=t});
 P.forEach(p=>PB[p.id]=p);
 const byOvr=[...P].sort((a,b)=>gi(b.ovr)-gi(a.ovr)||a.rank-b.rank),byPot=[...P].sort((a,b)=>gi(b.pot)-gi(a.pot)||a.rank-b.rank);
 const POS=['QB','RB','WR','TE','OT','OG','C','DE','DT','OLB','ILB','CB','FS','SS','K','P','FB'];
-const PACE={Normal:350,Fast:60,Instant:0};
-const GRT={"1":[1.38,1.31,1.05,0.62,0.56,0.35,0.12,-0.09,-0.6,-1.59,-3.57],"2":[1.52,1.29,1.07,0.82,0.61,0.39,0.16,-0.12,-0.45,-1.44,-3.41],"3":[1.54,1.28,1.08,0.86,0.69,0.47,0.3,0.04,-0.27,-1.18,-2.98],"4":[1.52,1.26,1.08,0.89,0.74,0.55,0.37,0.11,-0.2,-1.06,-2.78],"5":[1.52,1.27,1.08,0.9,0.74,0.57,0.39,0.16,-0.16,-1,-2.68],"6":[1.46,1.24,1.05,0.9,0.74,0.56,0.38,0.12,-0.21,-1.04,-2.71],"7":[1.44,1.23,1.05,0.88,0.72,0.54,0.36,0.12,-0.19,-1,-2.63]},GL=['A+','A','A-','B+','B','B-','C+','C','C-','D+','D'];
+const PACE={Slow:3000,Normal:1500,Fast:350,Instant:0};
+const GL=['A+','A','A-','B+','B','B-','C+','C','C-','D+','D'],GT=[97,93,89,84,79,74,69,63,56,49,41];
 const VAL=[1000.0, 717.17, 514.33, 490.52, 467.81, 446.15, 425.5, 405.8, 387.01, 369.09, 357.62, 346.51, 335.74, 325.31, 315.2, 305.41, 295.92, 286.72, 277.81, 269.18, 260.82, 252.71, 244.86, 237.25, 229.88, 222.74, 215.81, 209.11, 202.61, 196.31, 190.21, 184.3, 179.54, 174.89, 170.37, 165.97, 161.67, 157.49, 153.42, 149.45, 145.59, 141.82, 138.15, 134.58, 131.1, 127.71, 124.41, 121.19, 118.06, 115.0, 112.03, 109.13, 106.31, 103.56, 100.88, 98.27, 95.73, 93.26, 90.84, 88.49, 86.21, 83.98, 81.81, 79.69, 77.95, 76.25, 74.59, 72.97, 71.38, 69.82, 68.3, 66.81, 65.36, 63.93, 62.54, 61.18, 59.85, 58.54, 57.27, 56.02, 54.8, 53.6, 52.44, 51.29, 50.18, 49.08, 48.01, 46.97, 45.94, 44.94, 43.96, 43.01, 42.07, 41.15, 40.26, 39.38, 38.52, 37.68, 36.86, 36.06, 35.26, 34.49, 33.73, 32.98, 32.26, 31.55, 30.85, 30.17, 29.51, 28.86, 28.22, 27.6, 27.0, 26.4, 25.82, 25.25, 24.7, 24.15, 23.62, 23.1, 22.59, 22.09, 21.61, 21.13, 20.67, 20.21, 19.77, 19.33, 18.91, 18.49, 18.08, 17.68, 17.29, 16.91, 16.54, 16.18, 15.82, 15.47, 15.13, 14.8, 14.47, 14.15, 13.84, 13.54, 13.24, 12.95, 12.66, 12.38, 12.11, 11.85, 11.58, 11.33, 11.08, 10.84, 10.6, 10.36, 10.14, 9.91, 9.69, 9.48, 9.27, 9.07, 8.87, 8.67, 8.48, 8.3, 8.11, 7.93, 7.76, 7.59, 7.42, 7.26, 7.1, 6.94, 6.79, 6.64, 6.49, 6.35, 6.21, 6.07, 5.94, 5.81, 5.68, 5.56, 5.43, 5.31, 5.2, 5.08, 4.97, 4.86, 4.75, 4.65, 4.55, 4.45, 4.35, 4.25, 4.16, 4.07, 3.98, 3.89, 3.81, 3.72, 3.64, 3.56, 3.48, 3.4, 3.33, 3.26, 3.18, 3.11, 3.05, 2.98, 2.91, 2.85, 2.79, 2.73, 2.67, 2.61, 2.55, 2.49, 2.44, 2.38, 2.33, 2.28, 2.23, 2.18, 2.13, 2.09, 2.04, 2.0, 1.95, 1.91, 1.87, 1.83, 1.79, 1.75, 1.71, 1.67, 1.63, 1.6, 1.56, 1.53, 1.49, 1.46, 1.43, 1.4, 1.37, 1.34, 1.31, 1.28, 1.25, 1.22, 1.2, 1.17, 1.14, 1.12],OFFER_MIN=.85;
-const grade=(x,R)=>{const th=GRT[R]||GRT[7],i=th.findIndex(v=>x>=v);return i<0?'F':GL[i]};
+const grade=x=>{const i=GT.findIndex(v=>x>=v);return i<0?'F':GL[i]};
 const sl=s=>`Round ${s.r+1}, pick ${s.overall}`+(s.orig!==s.owner?` (from ${s.orig})`:'');
 const ht=h=>`${Math.floor(h/12)}'${h%12}"`;
 let S={sel:[],pace:'Normal',rounds:7};
@@ -349,8 +353,8 @@ function advance(){
     if(S.paused)return;
     const pace=S.auto?0:PACE[S.pace];
     while(S.i<slots.length&&(S.auto||!S.mine.has(slots[S.i].owner))){
+      if(pace>0){renderAll();S.t=setTimeout(()=>{if(S.paused)return;aiTurn();go()},pace);return}
       aiTurn();
-      if(pace>0){renderAll();S.t=setTimeout(go,pace);return}
     }
     if(S.i>=slots.length)return finish();
     renderAll();
@@ -376,19 +380,20 @@ function openPlayer(id){
 }
 
 /* ---------- results ---------- */
-const verdict=k=>{const d=k.overall-k.p.rank;return d>=15?`<span class="tag v">Value (+${d})</span>`:d<=-15?`<span class="tag x">Reach (${d})</span>`:'<span class="tag">Fair</span>'};
-const gradeOf=a=>grade(classScore(S.tp[a],T[a],P),S.rounds);
+const vd=k=>{const d=k.overall-k.p.rank,tl=tol(k.overall);return d>=tl?{c:'v',t:`Value (+${d})`}:d<=-tl?{c:'x',t:`Reach (${d})`}:{c:'',t:'Fair'}};
+const verdict=k=>{const v=vd(k);return `<span class="tag ${v.c}">${v.t}</span>`};
+const gradeOf=a=>grade(classScore(S.tp[a],T[a]));
 function teamRes(a,multi){
   const t=T[a],mine=S.tp[a],filled=t.needs.filter(n=>mine.some(k=>hasPos(k.p,n))),h=multi?`<h2 class="tbn" style="${tcs(a)};font-size:30px;margin:22px 0 8px;padding:8px 16px">${esc(t.name)}</h2>`:'';
   if(!mine.length)return h+'<div class="panel li up">No picks in these rounds.</div>';
-  const top=multi?`<p style="margin:0 0 8px;color:var(--mut)"><b style="color:var(--ink)">${mine.length} pick${mine.length===1?'':'s'}</b> · Filled ${filled.length} of ${t.needs.length} needs${filled.length?': '+filled.join(', '):''}</p>`:`<div class="panel" style="padding:14px 16px;display:flex;gap:24px;align-items:center;flex-wrap:wrap"><div class="gl"><span class="gt">${esc(t.name)}</span><span class="gr" aria-label="Class grade">${gradeOf(a)}</span></div><div><b>${mine.length} pick${mine.length===1?'':'s'}</b><br>Filled ${filled.length} of ${t.needs.length} needs${filled.length?': '+filled.join(', '):''}.<br><span style="color:var(--mut)">Grade compares each pick to the board ranking at that slot, plus a bonus for needs filled.</span></div></div>`;
+  const top=multi?`<p style="margin:0 0 8px;color:var(--mut)"><b style="color:var(--ink)">${mine.length} pick${mine.length===1?'':'s'}</b> · Filled ${filled.length} of ${t.needs.length} needs${filled.length?': '+filled.join(', '):''}</p>`:`<div class="panel" style="padding:14px 16px;display:flex;gap:24px;align-items:center;flex-wrap:wrap"><div class="gl"><span class="gt">${esc(t.name)}</span><span class="gr" aria-label="Class grade">${gradeOf(a)}</span></div><div><b>${mine.length} pick${mine.length===1?'':'s'}</b><br>Filled ${filled.length} of ${t.needs.length} needs${filled.length?': '+filled.join(', '):''}.<br><span style="color:var(--mut)">Grade rewards picks that fill an open need without reaching, with the best marks for surplus value.</span><br><button class="ghost" id="shg" data-a="${a}" style="margin-top:10px">Share image</button></div></div>`;
   return h+top+`
   <div class="panel" style="margin-top:12px"><div class="rr hd" style="color:var(--mut)"><span>Pick</span><span>Player</span><span>Pos</span><span>Ovr / Pot</span><span class="bk">Prospect rank</span></div>
   ${mine.map(k=>`<div class="rr" data-id="${k.p.id}" style="cursor:pointer"><span>${k.overall}<br><span class="tag">Rd ${k.r+1}</span></span><div style="min-width:0"><b>${esc(k.p.name)}</b><br><span class="tag">${esc(k.p.school||'Unsigned')} · ${verdict(k)}</span></div><b>${k.p.pos}</b><span>${k.p.ovr} / ${k.p.pot}</span><span class="bk">#${k.p.rank}</span></div>`).join('')}</div>`;
 }
 function recap(){
   const r1=S.log.filter(k=>k.r===0),half=n=>`<div style="overflow-x:auto"><table class="rt2"><thead><tr><th>#</th><th>Team</th><th>Player</th><th>Pos</th><th>School</th><th>Ovr / Pot</th></tr></thead><tbody>${r1.slice(n,n+16).map(k=>`<tr class="${S.mine.has(k.owner)?'me':''}"><td class="n">${k.overall}</td><td style="white-space:nowrap"><b class="tm" style="${tcs(k.owner)}">${k.owner}</b>${k.orig!==k.owner?`<span class="via">via ${k.orig}</span>`:''}</td><td><b>${esc(k.p.name)}</b></td><td>${k.p.pos}</td><td>${esc(k.p.school||'Unsigned')}</td><td>${k.p.ovr} / ${k.p.pot}</td></tr>`).join('')}</tbody></table></div>`;
-  return `<section class="rc"><div class="rch"><h2 style="font-size:34px">Round 1 recap</h2><span style="color:var(--mut);font-size:13px">SimNFL Mock Draft · shaded rows are your picks</span></div><div class="rcg">${half(0)}${half(16)}</div></section>`;
+  return `<section class="rc"><div class="rch"><h2 style="font-size:34px">Round 1 recap</h2><div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span style="color:var(--mut);font-size:13px">SimNFL Mock Draft · shaded rows are your picks</span><button class="ghost" id="shr">Share image</button></div></div><div class="rcg">${half(0)}${half(16)}</div></section>`;
 }
 function finish(){
   S.phase='done';
@@ -402,6 +407,78 @@ function finish(){
   ${Array.from({length:S.rounds},(_,r)=>r).map(r=>`<details class="rd"><summary>Round ${r+1}</summary>${S.log.filter(k=>k.r===r).map(k=>`<div class="li${S.mine.has(k.owner)?' me':''}" data-id="${k.p.id}"><b>${k.overall}. ${tm(k.owner)} ${esc(k.p.name)}</b><small>${k.p.pos} · ${esc(k.p.school||'Unsigned')} · ${k.p.ovr}/${k.p.pot}</small></div>`).join('')}</details>`).join('')}
   <div style="height:40px"></div>`;
   scrollTo(0,0);
+}
+
+/* ---------- share images ---------- */
+const FH='"Barlow Condensed","Arial Narrow",Impact,sans-serif',FB='system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
+const cv=(w,h)=>{const c=document.createElement('canvas');c.width=w;c.height=h;return c};
+function rrect(x,a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath()}
+function fitText(x,s,w){s=String(s);if(x.measureText(s).width<=w)return s;while(s.length>1&&x.measureText(s+'…').width>w)s=s.slice(0,-1);return s+'…'}
+function pillC(x,a,px,py,h,fs){const [p,s]=TC[a]||['#5B6781','#9AA6BF'];x.font=`700 ${fs}px ${FB}`;const w=Math.ceil(x.measureText(a).width)+20;x.fillStyle=s;rrect(x,px,py,w,h,6);x.fill();x.fillStyle=p;rrect(x,px,py,w,h-4,6);x.fill();x.fillStyle=ink(p);x.textAlign='center';x.textBaseline='middle';x.fillText(a,px+w/2,py+(h-4)/2+1);x.textAlign='left';return w}
+function strip(x,a,b,w,h){const n=D.teams.length,sw=(w-3*(n-1))/n;D.teams.forEach((t,i)=>{const [p,s]=TC[t.abbr],px=a+i*(sw+3);x.fillStyle=s;x.fillRect(px,b,sw,h);x.fillStyle=p;x.fillRect(px,b,sw,h*.64)})}
+function recapCanvas(){
+  const r1=S.log.filter(k=>k.r===0),W=1600,M=44,G=44,cw=(W-2*M-G)/2,rh=46,n=Math.ceil(r1.length/2),H=190+n*rh+90,c=cv(W,H),x=c.getContext('2d');
+  x.fillStyle='#fff';x.fillRect(0,0,W,H);
+  x.fillStyle='#16213A';x.font=`700 70px ${FH}`;x.fillText('Round 1 recap',M,88);
+  x.textAlign='right';x.fillStyle='#5B6781';x.font=`600 26px ${FB}`;x.fillText('SimNFL Mock Draft Simulator',W-M,60);x.font=`400 20px ${FB}`;x.fillText('2028 class · shaded rows are the user’s picks',W-M,90);x.textAlign='left';
+  strip(x,M,112,W-2*M,12);
+  const cols={n:0,t:48,p:186,pos:452,s:540,o:632};
+  [0,1].forEach(h=>{
+    const x0=M+h*(cw+G);
+    x.textBaseline='alphabetic';x.fillStyle='#5B6781';x.font=`700 17px ${FB}`;
+    [['#','n'],['TEAM','t'],['PLAYER','p'],['POS','pos'],['SCHOOL','s'],['OVR / POT','o']].forEach(([l,k])=>x.fillText(l,x0+cols[k],166));
+    x.fillStyle='#CBD3DE';x.fillRect(x0,176,cw,2);
+    r1.slice(h*n,h*n+n).forEach((k,i)=>{
+      const y=190+i*rh,cy=y+rh/2;
+      if(S.mine.has(k.owner)){x.fillStyle='#E3F3EA';x.fillRect(x0-8,y,cw+16,rh)}
+      x.fillStyle='#CBD3DE';x.fillRect(x0,y+rh-1,cw,1);
+      x.textBaseline='middle';x.fillStyle='#5B6781';x.font=`600 20px ${FB}`;x.fillText(String(k.overall),x0+cols.n,cy);
+      const pw=pillC(x,k.owner,x0+cols.t,y+8,rh-16,19);x.textBaseline='middle';
+      if(k.orig!==k.owner){x.fillStyle='#5B6781';x.font=`400 14px ${FB}`;x.fillText('via '+k.orig,x0+cols.t+pw+6,cy)}
+      x.fillStyle='#16213A';x.font=`700 20px ${FB}`;x.fillText(fitText(x,k.p.name,cols.pos-cols.p-10),x0+cols.p,cy);
+      x.font=`600 19px ${FB}`;x.fillText(k.p.pos+(k.p.pos2?'/'+k.p.pos2:''),x0+cols.pos,cy);
+      x.fillStyle='#5B6781';x.font=`400 18px ${FB}`;x.fillText(fitText(x,k.p.school||'Unsigned',cols.o-cols.s-8),x0+cols.s,cy);
+      x.fillStyle='#16213A';x.font=`600 19px ${FB}`;x.fillText(`${k.p.ovr} / ${k.p.pot}`,x0+cols.o,cy);
+    });
+  });
+  x.textBaseline='alphabetic';x.fillStyle='#5B6781';x.font=`500 20px ${FB}`;x.fillText('SimNFL Mock Draft Simulator',M,H-34);
+  return c;
+}
+function gradeCanvas(a){
+  const t=T[a],picks=S.tp[a],[p,s]=TC[a],tx=ink(p),W=1080,M=52,rh=picks.length>10?60:76,head=330,H=head+70+picks.length*rh+100,c=cv(W,H),x=c.getContext('2d');
+  const got=t.needs.filter(n=>picks.some(k=>hasPos(k.p,n)));
+  x.fillStyle='#fff';x.fillRect(0,0,W,H);
+  x.fillStyle=s;x.fillRect(0,0,W,head);x.fillStyle=p;x.fillRect(0,0,W,head-14);
+  const bx=W-M-210,by=58;x.fillStyle=tx;rrect(x,bx,by,210,210,26);x.fill();
+  x.fillStyle=p;x.textAlign='center';x.textBaseline='middle';x.font=`700 150px ${FH}`;x.fillText(gradeOf(a),bx+105,by+122);x.font=`700 20px ${FB}`;x.fillText('CLASS GRADE',bx+105,by+28);
+  x.textAlign='left';x.textBaseline='alphabetic';
+  x.fillStyle=tx;let fs=84;x.font=`700 ${fs}px ${FH}`;const mw=W-2*M-250;while(x.measureText(t.name).width>mw&&fs>40){fs-=4;x.font=`700 ${fs}px ${FH}`}
+  x.fillText(t.name,M,150);
+  x.font=`600 28px ${FB}`;x.fillText(`SimNFL Mock Draft · ${S.rounds===1?'Round 1':'Rounds 1–'+S.rounds}`,M,204);
+  x.font=`400 24px ${FB}`;x.fillText(fitText(x,`${picks.length} pick${picks.length===1?'':'s'} · Filled ${got.length} of ${t.needs.length} needs${got.length?': '+got.join(', '):''}`,mw),M,248);
+  x.fillStyle='#5B6781';x.font=`700 18px ${FB}`;x.fillText('PICK',M,head+44);x.fillText('PLAYER',M+130,head+44);x.textAlign='right';x.fillText('VALUE',W-M,head+44);x.textAlign='left';
+  x.fillStyle='#CBD3DE';x.fillRect(M,head+56,W-2*M,2);
+  const tw=W-2*M-130-200,big=rh>64;
+  picks.forEach((k,i)=>{
+    const y=head+66+i*rh,v=vd(k),cy=y+rh/2;
+    if(i%2===0){x.fillStyle='#F4F6F9';x.fillRect(M-12,y,W-2*M+24,rh)}
+    x.textBaseline='middle';
+    x.fillStyle='#16213A';x.font=`700 ${big?34:30}px ${FH}`;x.fillText('#'+k.overall,M,cy-8);
+    x.fillStyle='#5B6781';x.font=`500 16px ${FB}`;x.fillText('Rd '+(k.r+1),M,cy+16);
+    x.fillStyle='#16213A';x.font=`700 ${big?26:23}px ${FB}`;x.fillText(fitText(x,k.p.name,tw),M+130,cy-10);
+    x.fillStyle='#5B6781';x.font=`400 ${big?19:17}px ${FB}`;x.fillText(fitText(x,`${k.p.pos}${k.p.pos2?'/'+k.p.pos2:''} · ${k.p.school||'Unsigned'} · ${k.p.ovr} / ${k.p.pot}`,tw),M+130,cy+14);
+    x.textAlign='right';x.font=`700 ${big?22:20}px ${FB}`;x.fillStyle=v.c==='v'?'#1F7A4D':v.c==='x'?'#B3402A':'#5B6781';x.fillText(v.t,W-M,cy);x.textAlign='left';
+  });
+  x.textBaseline='alphabetic';x.fillStyle='#5B6781';x.font=`500 20px ${FB}`;x.fillText('SimNFL Mock Draft Simulator',M,H-48);strip(x,M,H-32,W-2*M,10);
+  return c;
+}
+async function shareImg(make,name){
+  try{await Promise.race([document.fonts.load('700 40px "Barlow Condensed"'),new Promise(r=>setTimeout(r,1500))])}catch(e){}
+  const blob=await new Promise(r=>make().toBlob(r,'image/png'));
+  if(!blob){toast('Could not create the image');return}
+  let d=null;try{if(window.claude&&claude.use)d=await claude.use('downloads')}catch(e){}
+  if(d){try{await d.save({filename:name,data:blob});toast('Image saved')}catch(e){if(!e||e.code!=='declined')toast('Could not save the image')}return}
+  const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);toast('Image downloaded');
 }
 
 /* ---------- events ---------- */
@@ -428,6 +505,8 @@ document.addEventListener('click',e=>{
   if(b.id==='tback')return renderTrade(S.tr.res);
   if(b.id==='tdone')return doTrade(S.tr.a,S.tr.b,S.tr.res.give,S.tr.res.get,'agreed');
   if(b.id==='tforce2')return doTrade(S.tr.a,S.tr.b,S.tr.res.give,S.tr.res.get,'forced');
+  if(b.id==='shr')return shareImg(recapCanvas,'simnfl-mock-draft-round-1-recap.png');
+  if(b.id==='shg'){const a=b.dataset.a;return shareImg(()=>gradeCanvas(a),`simnfl-${a.toLowerCase()}-draft-grade.png`)}
   if(b.id==='sim'){S.auto=true;S.paused=false;return advance()}
   if(b.id==='auto'){aiTurn();S.paused=false;return advance()}
   if(b.id==='dr'){$('#dlg').close();return userPick(+b.dataset.id)}
@@ -443,7 +522,7 @@ document.addEventListener('click',e=>{
 document.addEventListener('input',e=>{if(e.target.id==='q'){S.f.q=e.target.value;S.f.limit=50;renderRows()}});
 document.addEventListener('change',e=>{
   if(e.target.id==='sort'){S.f.sort=e.target.value;S.f.limit=50;renderRows()}
-  if(e.target.id==='pace'){S.pace=e.target.value}
+  if(e.target.id==='pace'){S.pace=e.target.value;if(S.phase==='draft'&&S.started&&!S.paused&&S.i<slots.length&&!S.mine.has(slots[S.i].owner))advance()}
   if(e.target.id==='ta'){S.tr.a=e.target.value;if(S.tr.b===S.tr.a)S.tr.b=D.teams.map(t=>t.abbr).find(x=>x!==S.tr.a);renderTrade()}
   if(e.target.id==='tb'){S.tr.b=e.target.value;renderTrade()}
 });
