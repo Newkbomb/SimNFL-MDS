@@ -81,7 +81,7 @@ dialog::backdrop{background:rgba(10,16,30,.55)}.dl{padding:16px;display:grid;gap
 .bn{font:700 24px/1.1 "Barlow Condensed","Arial Narrow",sans-serif}.bl{display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}.bl span{color:var(--mut)}.bl em{font-style:normal;font-size:12px;color:var(--mut)}
 .ot{font-style:normal;font-size:11px;font-weight:700;background:var(--fl);color:var(--fx);padding:1px 6px;border-radius:4px}
 .bp{font-size:13px;margin-top:2px}.bp b{color:var(--ac)}.bnd{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px}
-.nc{font-size:11px;font-weight:700;border:1px solid var(--ln);border-radius:4px;padding:0 5px}.nc.f{opacity:.4;text-decoration:line-through}
+.nl{font-size:11px;font-weight:700;color:var(--mut);align-self:center;margin-right:2px;text-transform:uppercase;letter-spacing:.04em}.nc{font-size:11px;font-weight:700;border:1px solid var(--ln);border-radius:4px;padding:0 5px}.nc.f{opacity:.4;text-decoration:line-through}
 .tm{display:inline-block;background:var(--tp);color:var(--tt);border-bottom:3px solid var(--ts);padding:0 7px;border-radius:5px;font-weight:700;letter-spacing:.02em;line-height:1.35;box-shadow:0 0 0 1px rgba(128,128,128,.28)}
 .cbar{display:flex;gap:3px;margin-top:16px;height:12px;max-width:560px}.cbar i{flex:1;border-radius:3px}
 .tbn{background:var(--tp);color:var(--tt);border-bottom:6px solid var(--ts);border-radius:10px}.hero.tbn{padding:16px 20px;margin-top:18px}
@@ -187,7 +187,6 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 const P=prep(D),ALL=buildSlots(D.teams),T={},PB={};let slots=ALL;const own=a=>slots.filter(s=>s.owner===a);
 D.teams.forEach(t=>{T[t.abbr]=t});
 P.forEach(p=>PB[p.id]=p);
-const byOvr=[...P].sort((a,b)=>gi(b.ovr)-gi(a.ovr)||a.rank-b.rank),byPot=[...P].sort((a,b)=>gi(b.pot)-gi(a.pot)||a.rank-b.rank);
 const POS=['QB','RB','WR','TE','OT','OG','C','DE','DT','OLB','ILB','CB','FS','SS','K','P','FB'];
 const PACE={Slow:3000,Normal:1500,Fast:350,Instant:0};
 const GL=['A+','A','A-','B+','B','B-','C+','C','C-','D+','D'],GT=[97,93,89,84,79,74,69,63,56,49,41];
@@ -218,14 +217,13 @@ function startDraft(){
   if(!S.sel.reduce((x,y)=>x+own(y).length,0))return;
   slots=ALL.filter(s=>s.r<S.rounds).map(s=>({...s}));
   S={...S,phase:'draft',trades:[],started:false,paused:false,mine:new Set(S.sel),focus:D.teams.map(t=>t.abbr).find(a=>S.sel.includes(a)),i:0,taken:{},tp:{},log:[],rc:{},rcR:-1,tab:'pool',tpOpen:false,lastCur:-1,auto:false,t:null,
-     f:{pos:'ALL',q:'',sort:'rank',needs:false,limit:50}};
+     f:{pos:'ALL',q:'',needs:false,limit:50}};
   D.teams.forEach(t=>S.tp[t.abbr]=[]);
   $('#app').innerHTML=`<div id="clock" class="clock"></div>
   <nav class="tabs" id="tabs"><button class="pn" data-t="board">Draft board</button><button class="pn" data-t="pool">Player pool</button><button class="tpb" id="tpbtn" data-t="team" aria-expanded="false" aria-controls="tp"></button><div id="tp" class="tp panel" hidden></div></nav>
   <div id="main" data-tab="pool"><section class="panel dboard"><div class="ph"><h2>Draft board</h2><span>${slots.length} picks · ${S.rounds} round${S.rounds===1?'':'s'}</span></div><div id="dbody" class="scr"></div></section>
   <section class="panel pool"><div class="flt">
    <input type="search" id="q" placeholder="Search name or school" aria-label="Search players">
-   <select id="sort" aria-label="Sort"><option value="rank">Prospect rank</option><option value="ovr">Overall</option><option value="pot">Potential</option></select>
    <button class="chip" id="nd" aria-pressed="false">Team needs</button>
    <span id="pc" style="display:flex;gap:4px;flex-wrap:wrap">${['ALL',...POS].map(p=>`<button class="chip" data-p="${p}" aria-pressed="${p==='ALL'}">${p}</button>`).join('')}</span></div>
    <div class="row rowh"><span>#</span><span>Player</span><span>Pos</span><span>Ovr</span><span>Pot</span></div>
@@ -247,7 +245,7 @@ function renderClock(){
 }
 function renderRows(){
   $('#nd').textContent='Needs · '+S.focus;
-  const f=S.f,src=f.sort==='ovr'?byOvr:f.sort==='pot'?byPot:P,q=f.q.toLowerCase(),nd=new Set(myNeeds()),isNeed=p=>nd.has(p.pos)||nd.has(p.pos2),out=[];let more=false;
+  const f=S.f,src=P,q=f.q.toLowerCase(),nd=new Set(myNeeds()),isNeed=p=>nd.has(p.pos)||nd.has(p.pos2),out=[];let more=false;
   for(const p of src){
     if(S.taken[p.id])continue;
     if(f.needs?!isNeed(p):(f.pos!=='ALL'&&!hasPos(p,f.pos)))continue;
@@ -317,7 +315,7 @@ function renderBoard(){
   slots.forEach((s,i)=>{
     if(s.r!==r){r=s.r;h+=`<div class="rh">Round ${r+1}</div>`}
     const k=made[s.overall],cur=i===S.i;
-    h+=`<div class="dk${cur?' cur':''}${S.mine.has(s.owner)?' me':''}${k?' dn':''}" style="${tcs(s.owner)}"${k?` data-id="${k.p.id}"`:''}><div class="bn">${s.overall}</div><div class="bm"><div class="bl"><b class="tm">${s.owner}</b><span>${esc(T[s.owner].name)}</span>${s.orig!==s.owner?`<em>via ${s.orig}</em>`:''}${cur?'<i class="ot">On the clock</i>':''}</div>${k?`<div class="bp"><b>${esc(k.p.name)}</b> ${k.p.pos}${k.p.pos2?'/'+k.p.pos2:''} · ${esc(k.p.school||'Unsigned')} · ${k.p.ovr}/${k.p.pot}</div>`:''}<div class="bnd">${needChips(s.owner)}</div></div></div>`;
+    h+=`<div class="dk${cur?' cur':''}${S.mine.has(s.owner)?' me':''}${k?' dn':''}" style="${tcs(s.owner)}"${k?` data-id="${k.p.id}"`:''}><div class="bn">${s.overall}</div><div class="bm"><div class="bl"><b class="tm">${s.owner}</b><span>${esc(T[s.owner].name)}</span>${s.orig!==s.owner?`<em>via ${s.orig}</em>`:''}${cur?'<i class="ot">On the clock</i>':''}</div>${k?`<div class="bp"><b>${esc(k.p.name)}</b> ${k.p.pos}${k.p.pos2?'/'+k.p.pos2:''} · ${esc(k.p.school||'Unsigned')} · ${k.p.ovr}/${k.p.pot}</div>`:''}<div class="bnd"><span class="nl">Needs</span>${needChips(s.owner)}</div></div></div>`;
   });
   el.innerHTML=h;el.scrollTop=st;
   if(S.lastCur!==S.i){S.lastCur=S.i;const c=el.querySelector('.dk.cur');if(c)el.scrollTop=Math.max(0,c.offsetTop-112)}
@@ -521,7 +519,6 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('input',e=>{if(e.target.id==='q'){S.f.q=e.target.value;S.f.limit=50;renderRows()}});
 document.addEventListener('change',e=>{
-  if(e.target.id==='sort'){S.f.sort=e.target.value;S.f.limit=50;renderRows()}
   if(e.target.id==='pace'){S.pace=e.target.value;if(S.phase==='draft'&&S.started&&!S.paused&&S.i<slots.length&&!S.mine.has(slots[S.i].owner))advance()}
   if(e.target.id==='ta'){S.tr.a=e.target.value;if(S.tr.b===S.tr.a)S.tr.b=D.teams.map(t=>t.abbr).find(x=>x!==S.tr.a);renderTrade()}
   if(e.target.id==='tb'){S.tr.b=e.target.value;renderTrade()}
