@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-11-01T23:48:42.421Z",
+  "updated": "2026-11-09T02:32:48.651Z",
   "teams": [
     {
       "abbr": "CIN",
@@ -22,23 +22,22 @@
       ]
     },
     {
-      "abbr": "DEN",
+      "abbr": "ARI",
       "order": 2,
       "needs": [
-        "OT",
         "WR",
-        "CB",
-        "DE",
+        "OG",
+        "SS",
         "TE"
       ],
       "owners": [
+        "ARI",
+        "ARI",
+        "CHI",
+        "ARI",
         "NYJ",
-        "HOU",
-        "WAS",
-        "GB",
-        "GB",
-        "BAL",
-        "DEN"
+        "CLE",
+        "ARI"
       ]
     },
     {
@@ -61,22 +60,23 @@
       ]
     },
     {
-      "abbr": "ARI",
+      "abbr": "DEN",
       "order": 4,
       "needs": [
+        "OT",
         "WR",
-        "OG",
-        "SS",
+        "CB",
+        "DE",
         "TE"
       ],
       "owners": [
-        "ARI",
-        "ARI",
-        "CHI",
-        "ARI",
         "NYJ",
-        "CLE",
-        "ARI"
+        "HOU",
+        "WAS",
+        "GB",
+        "GB",
+        "BAL",
+        "DEN"
       ]
     },
     {
@@ -140,27 +140,8 @@
       ]
     },
     {
-      "abbr": "HOU",
-      "order": 8,
-      "needs": [
-        "CB",
-        "OG",
-        "TE",
-        "OLB"
-      ],
-      "owners": [
-        "LAR",
-        "HOU",
-        "LAR",
-        "IND",
-        "HOU",
-        "HOU",
-        "DEN"
-      ]
-    },
-    {
       "abbr": "NYJ",
-      "order": 9,
+      "order": 8,
       "needs": [
         "ILB",
         "DE",
@@ -175,6 +156,26 @@
         "NYJ",
         "HOU",
         "SEA"
+      ]
+    },
+    {
+      "abbr": "DAL",
+      "order": 9,
+      "needs": [
+        "TE",
+        "OG",
+        "OLB",
+        "WR",
+        "QB"
+      ],
+      "owners": [
+        "CIN",
+        "DAL",
+        "DAL",
+        "LV",
+        "DAL",
+        "DAL",
+        "DAL"
       ]
     },
     {
@@ -197,67 +198,8 @@
       ]
     },
     {
-      "abbr": "TB",
-      "order": 11,
-      "needs": [
-        "WR",
-        "CB",
-        "OG",
-        "RB"
-      ],
-      "owners": [
-        "TB",
-        "TB",
-        "TB",
-        "TB",
-        "TB",
-        "TB",
-        "TB"
-      ]
-    },
-    {
-      "abbr": "ATL",
-      "order": 12,
-      "needs": [
-        "ILB",
-        "OT",
-        "OLB",
-        "FS",
-        "C"
-      ],
-      "owners": [
-        "ATL",
-        "ATL",
-        "ATL",
-        "ATL",
-        "ATL",
-        "NYJ",
-        "PIT"
-      ]
-    },
-    {
-      "abbr": "DAL",
-      "order": 13,
-      "needs": [
-        "TE",
-        "OG",
-        "OLB",
-        "WR",
-        "QB"
-      ],
-      "owners": [
-        "CIN",
-        "DAL",
-        "DAL",
-        "LV",
-        "DAL",
-        "DAL",
-        "DAL"
-      ]
-    },
-    {
       "abbr": "NE",
-      "order": 14,
+      "order": 11,
       "needs": [
         "OT",
         "OLB",
@@ -276,8 +218,46 @@
       ]
     },
     {
+      "abbr": "NYG",
+      "order": 12,
+      "needs": [
+        "QB",
+        "DE",
+        "WR",
+        "SS"
+      ],
+      "owners": [
+        "NYG",
+        "NYG",
+        "NYG",
+        "NYG",
+        "LV",
+        "NYG",
+        "NYG"
+      ]
+    },
+    {
+      "abbr": "HOU",
+      "order": 13,
+      "needs": [
+        "CB",
+        "OG",
+        "TE",
+        "OLB"
+      ],
+      "owners": [
+        "LAR",
+        "HOU",
+        "LAR",
+        "IND",
+        "HOU",
+        "HOU",
+        "DEN"
+      ]
+    },
+    {
       "abbr": "LV",
-      "order": 15,
+      "order": 14,
       "needs": [
         "QB",
         "OLB",
@@ -296,27 +276,8 @@
       ]
     },
     {
-      "abbr": "NYG",
-      "order": 16,
-      "needs": [
-        "QB",
-        "DE",
-        "WR",
-        "SS"
-      ],
-      "owners": [
-        "NYG",
-        "NYG",
-        "NYG",
-        "NYG",
-        "LV",
-        "NYG",
-        "NYG"
-      ]
-    },
-    {
       "abbr": "CHI",
-      "order": 17,
+      "order": 15,
       "needs": [
         "QB",
         "CB",
@@ -331,6 +292,45 @@
         "DEN",
         "CHI",
         "CHI"
+      ]
+    },
+    {
+      "abbr": "TB",
+      "order": 16,
+      "needs": [
+        "WR",
+        "CB",
+        "OG",
+        "RB"
+      ],
+      "owners": [
+        "TB",
+        "TB",
+        "TB",
+        "TB",
+        "TB",
+        "TB",
+        "TB"
+      ]
+    },
+    {
+      "abbr": "ATL",
+      "order": 17,
+      "needs": [
+        "ILB",
+        "OT",
+        "OLB",
+        "FS",
+        "C"
+      ],
+      "owners": [
+        "ATL",
+        "ATL",
+        "ATL",
+        "ATL",
+        "ATL",
+        "NYJ",
+        "PIT"
       ]
     },
     {
@@ -391,27 +391,8 @@
       ]
     },
     {
-      "abbr": "GB",
-      "order": 21,
-      "needs": [
-        "QB",
-        "DE",
-        "RB",
-        "DT"
-      ],
-      "owners": [
-        "GB",
-        "GB",
-        "GB",
-        "GB",
-        "GB",
-        "GB",
-        "GB"
-      ]
-    },
-    {
       "abbr": "LAC",
-      "order": 22,
+      "order": 21,
       "needs": [
         "FS",
         "OG",
@@ -426,6 +407,25 @@
         "LV",
         "NO",
         "LAC"
+      ]
+    },
+    {
+      "abbr": "GB",
+      "order": 22,
+      "needs": [
+        "QB",
+        "DE",
+        "RB",
+        "DT"
+      ],
+      "owners": [
+        "GB",
+        "GB",
+        "GB",
+        "GB",
+        "GB",
+        "GB",
+        "GB"
       ]
     },
     {
