@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-11-09T02:32:48.651Z",
+  "updated": "2026-11-16T19:36:37.623Z",
   "teams": [
     {
       "abbr": "CIN",
@@ -198,23 +198,23 @@
       ]
     },
     {
-      "abbr": "NE",
+      "abbr": "LV",
       "order": 11,
       "needs": [
-        "OT",
+        "QB",
         "OLB",
-        "ILB",
-        "DE",
+        "WR",
+        "CB",
         "C"
       ],
       "owners": [
-        "NE",
-        "NE",
-        "NE",
-        "BAL",
-        "NE",
-        "MIA",
-        "NE"
+        "LV",
+        "LV",
+        "LV",
+        "LV",
+        "LV",
+        "LV",
+        "LV"
       ]
     },
     {
@@ -237,8 +237,28 @@
       ]
     },
     {
-      "abbr": "HOU",
+      "abbr": "NE",
       "order": 13,
+      "needs": [
+        "OT",
+        "OLB",
+        "ILB",
+        "DE",
+        "C"
+      ],
+      "owners": [
+        "NE",
+        "NE",
+        "NE",
+        "BAL",
+        "NE",
+        "MIA",
+        "NE"
+      ]
+    },
+    {
+      "abbr": "HOU",
+      "order": 14,
       "needs": [
         "CB",
         "OG",
@@ -256,47 +276,8 @@
       ]
     },
     {
-      "abbr": "LV",
-      "order": 14,
-      "needs": [
-        "QB",
-        "OLB",
-        "WR",
-        "CB",
-        "C"
-      ],
-      "owners": [
-        "LV",
-        "LV",
-        "LV",
-        "LV",
-        "LV",
-        "LV",
-        "LV"
-      ]
-    },
-    {
-      "abbr": "CHI",
-      "order": 15,
-      "needs": [
-        "QB",
-        "CB",
-        "C",
-        "TE"
-      ],
-      "owners": [
-        "CHI",
-        "CHI",
-        "CHI",
-        "CHI",
-        "DEN",
-        "CHI",
-        "CHI"
-      ]
-    },
-    {
       "abbr": "TB",
-      "order": 16,
+      "order": 15,
       "needs": [
         "WR",
         "CB",
@@ -311,6 +292,25 @@
         "TB",
         "TB",
         "TB"
+      ]
+    },
+    {
+      "abbr": "CHI",
+      "order": 16,
+      "needs": [
+        "QB",
+        "CB",
+        "C",
+        "TE"
+      ],
+      "owners": [
+        "CHI",
+        "CHI",
+        "CHI",
+        "CHI",
+        "DEN",
+        "CHI",
+        "CHI"
       ]
     },
     {
@@ -391,27 +391,8 @@
       ]
     },
     {
-      "abbr": "LAC",
-      "order": 21,
-      "needs": [
-        "FS",
-        "OG",
-        "DE",
-        "SS"
-      ],
-      "owners": [
-        "LV",
-        "SF",
-        "LV",
-        "ARI",
-        "LV",
-        "NO",
-        "LAC"
-      ]
-    },
-    {
       "abbr": "GB",
-      "order": 22,
+      "order": 21,
       "needs": [
         "QB",
         "DE",
@@ -430,7 +411,7 @@
     },
     {
       "abbr": "TEN",
-      "order": 23,
+      "order": 22,
       "needs": [
         "OLB",
         "WR",
@@ -446,6 +427,25 @@
         "TEN",
         "TEN",
         "TEN"
+      ]
+    },
+    {
+      "abbr": "LAC",
+      "order": 23,
+      "needs": [
+        "FS",
+        "OG",
+        "DE",
+        "SS"
+      ],
+      "owners": [
+        "LV",
+        "SF",
+        "LV",
+        "ARI",
+        "LV",
+        "NO",
+        "LAC"
       ]
     },
     {
